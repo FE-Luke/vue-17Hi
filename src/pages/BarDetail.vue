@@ -3,20 +3,20 @@
     <v-header></v-header>
     <div class="detail" ref="detail">
       <div class="detail-wrapper">
-        <div class="swiper-content">
+        <div class="swiper-content" v-show="bar_detail.avilable">
           <div class="info">
             <div class="left clearfix">
-              <div class="name">{{barDetail.bar_details[0].name}}</div>
-              <div class="address">{{barDetail.bar_details[0].address}}</div>
-              <div class="status">{{barDetail.bar_details[0].avilable ? '营业中' : '休息'}}</div>
+              <div class="name">{{bar_detail.name}}</div>
+              <div class="address">{{bar_detail.address}}</div>
+              <div class="status">{{bar_detail.avilable ? '营业中' : '休息'}}</div>
             </div>
             <div class="right clearfix">
-              <div class="distance">{{barDetail.bar_details[0].distance}}公里</div>
+              <div class="distance">{{bar_detail.distance}}公里</div>
             </div>
           </div>
           <swiper :options="swiperOption" :not-next-tick="notNextTick" class="swiper">
             <!-- slides -->
-            <swiper-slide v-for="(image,index) in swiperImages" :key="index">
+            <swiper-slide v-for="(image,index) in bar_detail.bar_images" :key="index">
               <div class="mask"></div>
               <img v-lazy="image" class="lazyload">
             </swiper-slide>
@@ -25,7 +25,7 @@
           </swiper>
         </div>
         <div class="desc">
-          {{barDetail.bar_details[0].description}}
+          {{bar_detail.description}}
         </div>
       </div>
     </div>
@@ -39,26 +39,18 @@
   export default {
     name: 'app',
     async created (){
-      let _self = this;
       try{
-        let {data} = await _self.$http({
-          method: 'post',
-          url: _self.API + '/v1/bar/barDetails',
-          data: {
-            bar_id: _self.$route.params.id,
-            ..._self.geolocation
-          }
-        });
+        let {data} = await this.fetchData(this.$route.params.id);
         this.barDetail = data.data;
-        this.swiperImages = this.barDetail.bar_details[0].bar_images;
-      } catch (e){
+        this.bar_detail = this.barDetail.bar_details[0];
+      } catch(e) {
 
       }
-
     },
     data(){
       return {
         barDetail:{},
+        bar_detail:{},
         swiperImages:[],
         notNextTick: false,
         swiperOption: {
@@ -76,7 +68,22 @@
       }
     },
     methods: {
-
+      fetchData(bar_id){
+       return new Promise((resolve,reject) => {
+         this.$http({
+           method: 'post',
+           url: this.API + '/v1/bar/barDetails',
+           data: {
+             bar_id: bar_id,
+             ...this.geolocation
+           }
+         }).then((res) => {
+           resolve(res);
+         }).catch((e) => {
+           reject(e.response);
+         });
+       });
+      }
     },
     computed: {
       ...mapGetters(['API'])
@@ -85,6 +92,18 @@
       "v-header": Header,
       swiper,
       swiperSlide
+    },
+    watch: {
+      $route(to,from){
+        if(to.name === 'BarDetail'){
+          this.barDetail = {};
+          this.bar_detail = {};
+          this.fetchData(to.params.id).then((res) => {
+            this.barDetail = res.data.data;
+            this.bar_detail = this.barDetail.bar_details[0];
+          });
+        }
+      }
     }
   }
 </script>
