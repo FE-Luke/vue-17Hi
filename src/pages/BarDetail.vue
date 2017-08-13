@@ -86,7 +86,7 @@
       }
     },
     computed: {
-      ...mapGetters(['API'])
+      ...mapGetters(['API','geolocation'])
     },
     components: {
       "v-header": Header,
