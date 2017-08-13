@@ -3,7 +3,9 @@
     <transition name="fade">
       <v-splash v-show="splash" class="lazyload"></v-splash>
     </transition>
-    <router-view></router-view>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
