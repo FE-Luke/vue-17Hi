@@ -14,7 +14,7 @@
               <div class="distance">{{bar_detail.distance}}公里</div>
             </div>
           </div>
-          <swiper :options="swiperOption" :not-next-tick="notNextTick" class="swiper">
+          <swiper :options="swiperOption" :not-next-tick="notNextTick" class="swiper" ref="swiper">
             <!-- slides -->
             <swiper-slide v-for="(image,index) in bar_detail.bar_images" :key="index">
               <div class="mask"></div>
@@ -101,6 +101,9 @@
           this.fetchData(to.params.id).then((res) => {
             this.barDetail = res.data.data;
             this.bar_detail = this.barDetail.bar_details[0];
+            this.$nextTick(() => {
+              this.$refs['swiper'].swiper.slideTo(0,0);
+            });
           });
         }
       }
