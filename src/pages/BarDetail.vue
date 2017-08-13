@@ -3,7 +3,7 @@
     <v-header></v-header>
     <div class="detail" ref="detail">
       <div class="detail-wrapper">
-        <div class="swiper-content" v-show="bar_detail.avilable">
+        <div class="swiper-content">
           <div class="info">
             <div class="left clearfix">
               <div class="name">{{bar_detail.name}}</div>
